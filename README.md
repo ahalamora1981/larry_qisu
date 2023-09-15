@@ -7,7 +7,7 @@
 - Excel文件的每一列必须包含“管辖法院”和“承办律师”
 
 ### 二级目录格式示例:
-![示例图片](resource\docs_format.jpg)
+![示例图片](resource/docs_format.jpg)
 
 ### 导出ZIP文件格式:
 - 一级目录为一个文件夹，名为“output_起诉状和委托书”
@@ -28,7 +28,7 @@
 - Excel文件的每一列必须包含“管辖法院”和“承办律师”
 
 ### 二级目录格式示例:
-![示例图片](resource\docs_format_2.jpg)
+![示例图片](resource/docs_format_2.jpg)
 
 #### 导出ZIP文件格式:
 - 一级目录为两个文件夹，名为“王磊”和“张立人”
