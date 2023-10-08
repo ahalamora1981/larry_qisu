@@ -159,8 +159,9 @@ def doc_packing(input_path, output_path):
 
     # 复制身份证图片到对应律师的文档包
     for evi_file_name, evi_path in zip(evidence_list, evidence_path_list):
-        list_id = evi_file_name.split('-')[0]
-        case_folder = df[(df['列表ID']==list_id) & (df['是否可诉']=='诉讼')]['合同号'].tolist()[0] + '_' + df[df['列表ID']==list_id]['用户姓名'].tolist()[0]
+        list_id = int(evi_file_name.split('-')[0])
+        print(df.info())
+        case_folder = df[(df['列表ID']==list_id)]['合同号'].tolist()[0] + '_' + df[df['列表ID']==list_id]['用户姓名'].tolist()[0]
         if df[df['列表ID']==list_id]['承办律师'].tolist()[0] == '王磊':
             shutil.copy(evi_path, os.path.join(
                 wanglei_path, 
