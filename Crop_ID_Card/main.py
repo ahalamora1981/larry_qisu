@@ -162,12 +162,7 @@ def get_resized_image(image):
     
     return resized_image
 
-if __name__ == '__main__':
-    # 定义输入路径、输出路径和临时路径
-    input_path = '身份证'
-    output_path = 'output'
-    temp_path = 'temp'
-
+def crop_id_image():
     # 如果输出路径不存在，则创建它
     if output_path not in os.listdir('./'):
         os.mkdir(output_path)
@@ -176,19 +171,19 @@ if __name__ == '__main__':
     if temp_path not in os.listdir('./'):
         os.mkdir(temp_path)
 
+    # 如果临时路径不存在，则创建它
+    if output_docx_folder not in os.listdir('./'):
+        os.mkdir(output_docx_folder)
+
     # 获取输入路径中所有以'.jpg'结尾的图像文件名列表
     img_list = [img_name for img_name in os.listdir(input_path) if '.jpg' in img_name]
 
     # 构建完整的图像文件路径列表
     img_path_list = [os.path.join(input_path, img_name) for img_name in img_list]
 
-    salient_detect = pipeline(Tasks.semantic_segmentation, model='damo/cv_u2net_salient-detection')
-
-    face_detection = pipeline(task=Tasks.face_detection, model='damo/cv_resnet_facedetection_scrfd10gkps')
-
     start = time.time()
 
-    for i, img_path in enumerate(img_path_list):
+    for img_name, img_path in zip(img_list, img_path_list):
     
         try:    
             # 读取图片到image对象
@@ -214,13 +209,13 @@ if __name__ == '__main__':
             else:
                 pass
 
-            cv2.imwrite('temp.jpg', image)
+            cv2.imwrite('temp/temp.jpg', image)
 
             height, width = image.shape[:2]
 
             # 判断是否需要上下180度翻转
             if '正面' in img_path:
-                result = face_detection('temp.jpg')
+                result = face_detection('temp/temp.jpg')
                 if result['boxes'][0][0] < width/2:
                     print(f'{img_path} 翻转180度')
                     image = get_rotate_image_180(image)
@@ -232,11 +227,64 @@ if __name__ == '__main__':
             image = get_resized_image(image)
 
             # 输出图片
-            cv2.imwrite(os.path.join(output_path, 'output_' + img_path.split('/')[-1]), image)
+            cv2.imwrite(os.path.join(output_path, 'output_' + img_name), image)
 
         except Exception as e:
-            print(f'{img_path}:\n{e}\n')
+            print(f'!!!ERROR!!! {img_path}:\n{e}\n')
 
     duration = time.time() - start
 
     print(duration)
+
+def generate_docx(output_path, output_docx_folder):
+    # 如果临时路径不存在，则创建它
+    if output_docx_folder not in os.listdir('./'):
+        os.mkdir(output_docx_folder)
+
+    img_output_list = [img_name for img_name in os.listdir(output_path) if '.jpg' in img_name]
+    img_output_path_list = [os.path.join(output_path, img_name) for img_name in img_output_list]
+
+    for output_path in img_output_path_list:
+        if '正面' in output_path:
+            doc = Document()
+            
+            doc.add_paragraph()
+            doc.add_paragraph()
+            
+            image_front_p = doc.add_paragraph()
+            image_front_r = image_front_p.add_run()
+            image_front_r.add_picture(output_path, width=Inches(5))
+            image_front_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            
+            doc.add_paragraph()
+            doc.add_paragraph()
+            
+            image_back_p = doc.add_paragraph()
+            image_back_r = image_back_p.add_run()
+            image_back_r.add_picture(output_path.replace('正面', '反面'), width=Inches(5))
+            image_back_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            
+            doc_file_name = os.path.join(output_docx_folder, output_path.split('/')[-1].split('_')[1] + '_身份证正反面.docx')
+            
+            doc.save(doc_file_name)
+
+if __name__ == '__main__':
+    # 定义输入路径、输出路径和临时路径
+    input_path = '身份证'
+    output_path = 'output'
+    temp_path = 'temp'
+    output_docx_folder = '身份证_docx'
+
+    salient_detect = pipeline(Tasks.semantic_segmentation, model='damo/cv_u2net_salient-detection')
+    face_detection = pipeline(task=Tasks.face_detection, model='damo/cv_resnet_facedetection_scrfd10gkps')
+
+    # crop_id_image(
+    #     input_path,
+    #     output_path,
+    #     temp_path
+    # )
+
+    generate_docx(
+        output_path,
+        output_docx_folder
+    )
