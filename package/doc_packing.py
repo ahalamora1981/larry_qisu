@@ -153,6 +153,35 @@ def doc_packing(input_path, output_path):
 
     result += '\n\n起诉状和委托书已添加到文档包。'
 
+    evidence_folder = '凭证'
+    evidence_list = [evi for evi in os.listdir(os.path.join(input_path, evidence_folder)) if '.pdf' in evi]
+    evidence_path_list = [os.path.join(input_path, evidence_folder, evi) for evi in evidence_list]
+
+    # 复制身份证图片到对应律师的文档包
+    for evi_file_name, evi_path in zip(evidence_list, evidence_path_list):
+        list_id = evi_file_name.split('-')[0]
+        case_folder = df[(df['列表ID']==list_id) & (df['是否可诉']=='诉讼')]['合同号'].tolist()[0] + '_' + df[df['列表ID']==list_id]['用户姓名'].tolist()[0]
+        if df[df['列表ID']==list_id]['承办律师'].tolist()[0] == '王磊':
+            shutil.copy(evi_path, os.path.join(
+                wanglei_path, 
+                '文档包', 
+                doc_pack_folder, 
+                case_folder, 
+                evi_file_name
+                ))
+        elif df[df['列表ID']==list_id]['承办律师'].tolist()[0] == '张立人':
+            shutil.copy(evi_path, os.path.join(
+                zhangliren_path, 
+                '文档包', 
+                doc_pack_folder, 
+                case_folder, 
+                evi_file_name
+                ))
+        else:
+            print('律师匹配错误')
+
+    result += '\n\n凭证已添加到文档包。'
+
     return result
 
 if __name__ == '__main__':
