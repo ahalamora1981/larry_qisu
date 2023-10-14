@@ -4,6 +4,7 @@ import time
 import numpy as np
 import shutil
 import matplotlib.pyplot as plt
+from tqdm import tqdm
 
 from modelscope.pipelines import pipeline
 from modelscope.utils.constant import Tasks
@@ -162,7 +163,7 @@ def get_resized_image(image):
     
     return resized_image
 
-def crop_id_image():
+def crop_id_image(input_path, output_path, temp_path):
     # 如果输出路径不存在，则创建它
     if output_path not in os.listdir('./'):
         os.mkdir(output_path)
@@ -181,9 +182,7 @@ def crop_id_image():
     # 构建完整的图像文件路径列表
     img_path_list = [os.path.join(input_path, img_name) for img_name in img_list]
 
-    start = time.time()
-
-    for img_name, img_path in zip(img_list, img_path_list):
+    for img_name, img_path in tqdm(zip(img_list, img_path_list)):
     
         try:    
             # 读取图片到image对象
@@ -232,10 +231,6 @@ def crop_id_image():
         except Exception as e:
             print(f'!!!ERROR!!! {img_path}:\n{e}\n')
 
-    duration = time.time() - start
-
-    print(duration)
-
 def generate_docx(output_path, output_docx_folder):
     # 如果临时路径不存在，则创建它
     if output_docx_folder not in os.listdir('./'):
@@ -271,20 +266,20 @@ def generate_docx(output_path, output_docx_folder):
 if __name__ == '__main__':
     # 定义输入路径、输出路径和临时路径
     input_path = '身份证'
-    output_path = 'output'
+    output_path = 'output_temp'
     temp_path = 'temp'
     output_docx_folder = '身份证_docx'
 
     salient_detect = pipeline(Tasks.semantic_segmentation, model='damo/cv_u2net_salient-detection')
     face_detection = pipeline(task=Tasks.face_detection, model='damo/cv_resnet_facedetection_scrfd10gkps')
 
-    # crop_id_image(
-    #     input_path,
-    #     output_path,
-    #     temp_path
-    # )
-
-    generate_docx(
+    crop_id_image(
+        input_path,
         output_path,
-        output_docx_folder
+        temp_path
     )
+
+    # generate_docx(
+    #     output_path,
+    #     output_docx_folder
+    # )

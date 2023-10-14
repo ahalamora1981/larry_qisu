@@ -173,3 +173,18 @@ for lawyer in LAWYER_LIST:
                         os.path.join(INPUT_PATH, '起诉状', qsz),
                         os.path.join(OUTPUT_PATH, lawyer, case_folder, '起诉状.pdf')
                     )
+
+if 'output_final' not in os.listdir(BASE_PATH):
+    shutil.copytree(OUTPUT_PATH, os.path.join(BASE_PATH, 'output_final'))
+
+lawyer_list = os.listdir(os.path.join(BASE_PATH, 'output_final'))
+
+for lawyer in lawyer_list:
+    case_list = os.listdir(os.path.join(BASE_PATH, 'output_final', lawyer))
+
+    for case_folder in case_list:
+        if '-' in case_folder:
+            os.rename(
+                os.path.join(BASE_PATH, 'output_final', lawyer, case_folder),
+                os.path.join(BASE_PATH, 'output_final', lawyer, case_folder.split('-')[0]),
+            )
