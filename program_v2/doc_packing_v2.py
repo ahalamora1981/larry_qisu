@@ -117,7 +117,7 @@ for doc_pack_folder in doc_pack_list:
                     )
                     print(os.path.join(case_path, '证据', evidence + '.pdf'))
 
-# 分发文件到委托材料
+# 分发文件到委托材料目录
 for lawyer in LAWYER_LIST:
     case_list = os.listdir(os.path.join(OUTPUT_PATH, lawyer))
 
@@ -150,7 +150,7 @@ for lawyer in LAWYER_LIST:
                         os.path.join(OUTPUT_PATH, lawyer, case_folder, '委托材料', '授权委托书.pdf')
                     )
 
-        # 复制委托书到委托材料
+        # 复制身份证到委托材料
         username = df[df['合同号']==contract_id]['用户名'].tolist()[0]
 
         id_list = os.listdir(os.path.join(INPUT_PATH, '身份证_pdf'))
@@ -174,6 +174,7 @@ for lawyer in LAWYER_LIST:
                         os.path.join(OUTPUT_PATH, lawyer, case_folder, '起诉状.pdf')
                     )
 
+# 复制一个新的输出目录，按律师要求把案件目录简化(去掉最后的合同号)
 if 'output_final' not in os.listdir(BASE_PATH):
     shutil.copytree(OUTPUT_PATH, os.path.join(BASE_PATH, 'output_final'))
 
