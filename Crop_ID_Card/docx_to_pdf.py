@@ -5,7 +5,7 @@ from tqdm import tqdm
 
 wdFormatPDF = 17
 
-BASE_PATH = R'Documents\2023\10\文档自动归类\input'
+BASE_PATH = os.path.join(os.getcwd(), "Crop_ID_Card")
 
 INPUT_FOLDER = '身份证_docx'
 OUTPUT_FOLDER = '身份证_pdf'

@@ -270,7 +270,7 @@ if __name__ == '__main__':
     temp_path = 'temp'
     output_docx_folder = '身份证_docx'
 
-    salient_detect = pipeline(Tasks.semantic_segmentation, model='damo/cv_u2net_salient-detection')
+    salient_detect = pipeline(task=Tasks.semantic_segmentation, model='damo/cv_u2net_salient-detection')
     face_detection = pipeline(task=Tasks.face_detection, model='damo/cv_resnet_facedetection_scrfd10gkps')
 
     crop_id_image(
