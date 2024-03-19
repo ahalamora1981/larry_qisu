@@ -4,7 +4,7 @@ import shutil
 import zipfile
 
 from package.doc_process import doc_process
-from package.doc_packing import doc_packing
+from package.doc_packing_v2 import doc_packing
 from package.zip_process import zip_extract_all, compress_directory
 
 
@@ -162,9 +162,14 @@ if program == '2. 文档自动归类':
 
     if st.button('自动处理并生成ZIP文件'):
         if input_folder:
-            input_path = os.path.join(extract_folder, input_folder)
-            output_path = os.path.join(extract_folder, output_folder)
-            result = doc_packing(input_path, output_path)
+            extract_path = os.path.join(os.getcwd(), extract_folder)
+            input_path = os.path.join(extract_path, input_folder)
+            output_path = os.path.join(extract_path, output_folder)
+            result = doc_packing(
+                base_path=extract_path,
+                input_path=input_path, 
+                output_path=output_path
+            )
         else:
             result = '请先上传ZIP文件'
         st.write(result)

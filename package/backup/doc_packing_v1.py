@@ -3,10 +3,11 @@ import shutil
 import pandas as pd
 
 
-input_path = '原始文档\\文档自动归类\\input'
-output_path = '原始文档\\文档自动归类\\output'
+BASE_PATH = '原始文档\\文档自动归类'
+INPUT_PATH = '原始文档\\文档自动归类\\input'
+OUTPUT_PATH = '原始文档\\文档自动归类\\output'
 
-def doc_packing(input_path, output_path):
+def doc_packing(base_path, input_path, output_path):
 
     wanglei_folder = '王磊'
     zhangliren_folder = '张立人'
@@ -185,4 +186,8 @@ def doc_packing(input_path, output_path):
     return result
 
 if __name__ == '__main__':
-    doc_packing(input_path, output_path)
+    doc_packing(
+        base_path=BASE_PATH,
+        input_path=INPUT_PATH, 
+        output_path=OUTPUT_PATH
+    )
