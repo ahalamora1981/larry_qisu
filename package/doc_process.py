@@ -82,19 +82,32 @@ def doc_process(input_path, output_path):
                 font.size = Pt(14)
         
         # 判断担保公司
-        if '福建智云' in df[df['合同号']==contract_id]['融担公司'].tolist()[0]:
+        company_fullname = df[df['合同号']==contract_id]['融担公司'].tolist()[0]
+        
+        if '福建智云' in company_fullname:
             output_folder = qsz_output_fjzy
+            company = '福建智云'
             num_fjzy += 1
-        elif '海南申信' in df[df['合同号']==contract_id]['融担公司'].tolist()[0]:
+        elif '海南申信' in company_fullname:
             output_folder = qsz_output_hnsx
+            company = '海南申信'
             num_hnsx += 1
         else:
             output_folder = qsz_output_shex
+            company = '上海耳序'
             num_shex += 1
-            
+        
+        person = df[df['合同号']==contract_id]['用户姓名'].tolist()[0]
+
+        file_name = f'{person}起诉状-拓棱特-诉状-{company}-电子.docx'
+        
         # 保存文件到对应目录
-        output_path = os.path.join(output_folder, qsz_file)
-        doc.save(output_path)
+        output_path = os.path.join(output_folder, file_name)
+        
+        if os.path.exists(output_path):
+            raise FileExistsError
+        else:
+            doc.save(output_path)
 
     # 改律师名字和电话，并存到对应融担公司的目录中
     for wts_file in wts_file_list:
@@ -164,16 +177,30 @@ def doc_process(input_path, output_path):
                     run._element.rPr.rFonts.set(qn('w:eastAsia'),'宋体')                
 
         # 判断担保公司
-        if '福建智云' in df[df['合同号']==contract_id]['融担公司'].tolist()[0]:
+        company_fullname = df[df['合同号']==contract_id]['融担公司'].tolist()[0]
+        
+        if '福建智云' in company_fullname:
             output_folder = wts_output_fjzy
-        elif '海南申信' in df[df['合同号']==contract_id]['融担公司'].tolist()[0]:
+            company = '福建智云'
+        elif '海南申信' in company_fullname:
             output_folder = wts_output_hnsx
+            company = '海南申信'
         else:
             output_folder = wts_output_shex
+            company = '上海耳序'
+            
+        person = df[df['合同号']==contract_id]['用户姓名'].tolist()[0]
+
+        file_name = f'{person}委托书-拓棱特-委托书-{company}-电子.docx'
             
         # 保存文件到对应目录
-        output_path = os.path.join(output_folder, wts_file)
-        doc.save(output_path)
+        output_path = os.path.join(output_folder, file_name)
+        
+        if os.path.exists(output_path):
+            raise FileExistsError
+        else:
+            doc.save(output_path)
+            
     
     total_have = len(qsz_file_list)
     total_done = num_shex+num_fjzy+num_hnsx
