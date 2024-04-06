@@ -13,7 +13,7 @@ OUTPUT_PATH = os.path.join(BASE_PATH, OUTPUT_FOLDER)
 
 # 设定表格文件名，律师人名
 EXCEL_FILE = 'info.xlsx'
-LAWYER_LIST = ['王磊', '张立人']
+LAWYER_LIST = ['王磊', '张立人', '杨青']
 
 # 设定融担公司
 RONGDAN_LIST = [

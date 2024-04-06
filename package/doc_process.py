@@ -19,8 +19,15 @@ def doc_process(input_path, output_path):
     wts_output_fjzy = os.path.join(output_path, '委托书_福建智云')
     wts_output_hnsx = os.path.join(output_path, '委托书_海南申信')
 
+    phone_number = '15900621166'
+
+    # phone_wanglei = phone
+    # phone_zhangliren = phone
+    # phone_yangqing = phone
+
     phone_wanglei = '18916935832'
     phone_zhangliren = '13817213203'
+    phone_yangqing = '15221111951'
 
     qsz_file_list = os.listdir(qsz_folder)
     wts_file_list = os.listdir(wts_folder)
@@ -51,7 +58,6 @@ def doc_process(input_path, output_path):
     num_shex = 0
     num_fjzy = 0
     num_hnsx = 0
-    num_other_lawyer = 0
 
     # 改管辖法院，并存到对应融担公司的目录中
     for qsz_file in qsz_file_list:
@@ -99,7 +105,7 @@ def doc_process(input_path, output_path):
         
         person = df[df['合同号']==contract_id]['用户姓名'].tolist()[0]
 
-        file_name = f'{person}起诉状-拓棱特-诉状-{company}-电子.docx'
+        file_name = f'{person}起诉状{contract_id[-4:]}-拓棱特-诉状-{company}-电子.docx'
         
         # 保存文件到对应目录
         output_path = os.path.join(output_folder, file_name)
@@ -121,60 +127,94 @@ def doc_process(input_path, output_path):
         # 从文件名获取合同号
         contract_id = wts_file.split('_')[1]
         
+        for p in doc.paragraphs:
+            if phone_wanglei in p.text:
+                text_new_phone = p.text.replace(phone_wanglei, phone_number)
+                p.text = ''
+                # 加run用于修改字体
+                run = p.add_run(text_new_phone)
+                run.font.name = "Arial"
+                run._element.rPr.rFonts.set(qn('w:eastAsia'),'宋体')
+                # 调整字体
+                font = p.style.font
+                font.size = Pt(14)
+            elif phone_zhangliren in p.text:
+                text_new_phone = p.text.replace(phone_zhangliren, phone_number)
+                p.text = ''
+                # 加run用于修改字体
+                run = p.add_run(text_new_phone)
+                run.font.name = "Arial"
+                run._element.rPr.rFonts.set(qn('w:eastAsia'),'宋体')
+                # 调整字体
+                font = p.style.font
+                font.size = Pt(14)
+            elif phone_yangqing in p.text:
+                text_new_phone = p.text.replace(phone_yangqing, phone_number)
+                p.text = ''
+                # 加run用于修改字体
+                run = p.add_run(text_new_phone)
+                run.font.name = "Arial"
+                run._element.rPr.rFonts.set(qn('w:eastAsia'),'宋体')
+                # 调整字体
+                font = p.style.font
+                font.size = Pt(14)
+            else:
+                pass
+        
         # 从表格中找到对应合同号的管辖法院
-        lawyer = df[df['合同号']==contract_id]['承办律师'].tolist()[0]
-        user = df[df['合同号']==contract_id]['用户姓名'].tolist()[0]
+        # lawyer = df[df['合同号']==contract_id]['承办律师'].tolist()[0]
+        # user = df[df['合同号']==contract_id]['用户姓名'].tolist()[0]
 
         # 替换律师和电话
-        if lawyer != '王磊':
-            num_other_lawyer += 1
-            for p in doc.paragraphs:
-                if '王磊' in p.text and user not in p.text:
-                    text_new_name = p.text.replace('王磊', '张立人')
-                    p.text = ''
-                    # 加run用于修改字体
-                    run = p.add_run(text_new_name)
-                    run.font.name = "Arial"
-                    run._element.rPr.rFonts.set(qn('w:eastAsia'),'宋体')
-                    # 调整字体
-                    font = p.style.font
-                    font.size = Pt(14)
-                    
-                if phone_wanglei in p.text:
-                    text_new_phone = p.text.replace(phone_wanglei, phone_zhangliren)
-                    p.text = ''
-                    # 加run用于修改字体
-                    run = p.add_run(text_new_phone)
-                    run.font.name = "Arial"
-                    run._element.rPr.rFonts.set(qn('w:eastAsia'),'宋体')
-                    # 调整字体
-                    font = p.style.font
-                    font.size = Pt(14)
+        # if lawyer != '王磊':
+        #     num_other_lawyer += 1
+        #     for p in doc.paragraphs:
+        #         if '王磊' in p.text and user not in p.text:
+        #             text_new_name = p.text.replace('王磊', '张立人')
+        #             p.text = ''
+        #             # 加run用于修改字体
+        #             run = p.add_run(text_new_name)
+        #             run.font.name = "Arial"
+        #             run._element.rPr.rFonts.set(qn('w:eastAsia'),'宋体')
+        #             # 调整字体
+        #             font = p.style.font
+        #             font.size = Pt(14)
+        #             
+        #         if phone_wanglei in p.text:
+        #             text_new_phone = p.text.replace(phone_wanglei, phone_zhangliren)
+        #             p.text = ''
+        #             # 加run用于修改字体
+        #             run = p.add_run(text_new_phone)
+        #             run.font.name = "Arial"
+        #             run._element.rPr.rFonts.set(qn('w:eastAsia'),'宋体')
+        #             # 调整字体
+        #             font = p.style.font
+        #             font.size = Pt(14)
 
-                if '王磊' in p.text and user in p.text:
-                    # 现委托 王磊 在我单位与 沈黎宾 追偿权纠纷案件中，作为我单位的委托代理人，代理权限如下：
-                    p.text = ''
-                    run = p.add_run('现委托')
-                    run.font.name = "Arial"
-                    run._element.rPr.rFonts.set(qn('w:eastAsia'),'宋体')
+        #         if '王磊' in p.text and user in p.text:
+        #             # 现委托 王磊 在我单位与 沈黎宾 追偿权纠纷案件中，作为我单位的委托代理人，代理权限如下：
+        #             p.text = ''
+        #             run = p.add_run('现委托')
+        #             run.font.name = "Arial"
+        #             run._element.rPr.rFonts.set(qn('w:eastAsia'),'宋体')
 
-                    run = p.add_run(' 张立人 ')
-                    run.font.underline = True
-                    run.font.name = "Arial"
-                    run._element.rPr.rFonts.set(qn('w:eastAsia'),'宋体')
+        #             run = p.add_run(' 张立人 ')
+        #             run.font.underline = True
+        #             run.font.name = "Arial"
+        #             run._element.rPr.rFonts.set(qn('w:eastAsia'),'宋体')
 
-                    run = p.add_run('在我单位与')
-                    run.font.name = "Arial"
-                    run._element.rPr.rFonts.set(qn('w:eastAsia'),'宋体')
+        #             run = p.add_run('在我单位与')
+        #             run.font.name = "Arial"
+        #             run._element.rPr.rFonts.set(qn('w:eastAsia'),'宋体')
 
-                    run = p.add_run(f' {user} ')
-                    run.font.underline = True
-                    run.font.name = "Arial"
-                    run._element.rPr.rFonts.set(qn('w:eastAsia'),'宋体')
+        #             run = p.add_run(f' {user} ')
+        #             run.font.underline = True
+        #             run.font.name = "Arial"
+        #             run._element.rPr.rFonts.set(qn('w:eastAsia'),'宋体')
 
-                    run = p.add_run('追偿权纠纷案件中，作为我单位的委托代理人，代理权限如下：')
-                    run.font.name = "Arial"
-                    run._element.rPr.rFonts.set(qn('w:eastAsia'),'宋体')                
+        #             run = p.add_run('追偿权纠纷案件中，作为我单位的委托代理人，代理权限如下：')
+        #             run.font.name = "Arial"
+        #             run._element.rPr.rFonts.set(qn('w:eastAsia'),'宋体')                
 
         # 判断担保公司
         company_fullname = df[df['合同号']==contract_id]['融担公司'].tolist()[0]
@@ -191,7 +231,7 @@ def doc_process(input_path, output_path):
             
         person = df[df['合同号']==contract_id]['用户姓名'].tolist()[0]
 
-        file_name = f'{person}委托书-拓棱特-委托书-{company}-电子.docx'
+        file_name = f'{person}委托书{contract_id[-4:]}-拓棱特-委托书-{company}-电子.docx'
             
         # 保存文件到对应目录
         output_path = os.path.join(output_folder, file_name)
@@ -204,8 +244,7 @@ def doc_process(input_path, output_path):
     
     total_have = len(qsz_file_list)
     total_done = num_shex+num_fjzy+num_hnsx
-    result = f'共 {total_have} 条\n完成 {total_done} 条\n\n上海耳序：共 {num_shex} 条 | 福建智云：共 {num_fjzy} 条 | 海南申信：共 {num_hnsx} 条\n\n \
-王磊律师：共 {total_have-num_other_lawyer} 条 | 张立人律师：共 {num_other_lawyer} 条\n\n所有文档已完成自动编辑！'
+    result = f'共 {total_have} 条\n完成 {total_done} 条\n\n上海耳序：共 {num_shex} 条 | 福建智云：共 {num_fjzy} 条 | 海南申信：共 {num_hnsx} 条\n\n所有文档已完成自动编辑！'
     
     return result
 
