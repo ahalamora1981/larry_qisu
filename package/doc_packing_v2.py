@@ -23,7 +23,7 @@ RONGDAN_LIST = [
 ]
 
 # 合同号与律师对应关系
-CONTRACT_TO_LAWYER = {}
+contract_to_lawyer = {}
 
 # 证据文档列表
 EVIDENCE_LIST = [
@@ -63,7 +63,7 @@ def doc_packing(base_path, input_path, output_path):
 
         contract_id = row['合同号']
 
-        CONTRACT_TO_LAWYER[contract_id] = row['承办律师']
+        contract_to_lawyer[contract_id] = row['承办律师']
 
         case_folder = f'{idx}{rongdan}_{person} {court}-{contract_id}'
         
@@ -76,6 +76,9 @@ def doc_packing(base_path, input_path, output_path):
         if '证据' not in os.listdir(os.path.join(output_path, row['承办律师'], case_folder)):
             os.mkdir(os.path.join(output_path, row['承办律师'], case_folder, '证据'))
             
+        if '债转通知' not in os.listdir(os.path.join(output_path, row['承办律师'], case_folder)):
+            os.mkdir(os.path.join(output_path, row['承办律师'], case_folder, '债转通知'))
+            
     result = "目录已创建"
 
     # 分发凭证
@@ -83,20 +86,47 @@ def doc_packing(base_path, input_path, output_path):
 
     for pz in pz_list:
         list_id = int(pz.split('-')[0])
-        contract_id = df[df['列表ID']==list_id]['合同号'].tolist()[0]
+        
+        if list_id in df['列表ID'].tolist():
+            contract_id = df[df['列表ID']==list_id]['合同号'].tolist()[0]
 
-        lawyer = CONTRACT_TO_LAWYER[contract_id]
-        case_list = os.listdir(os.path.join(output_path, lawyer))
-        case_folder = [folder for folder in case_list if contract_id in folder][0]
-        case_path = os.path.join(output_path, lawyer, case_folder)
+            lawyer = contract_to_lawyer[contract_id]
+            case_list = os.listdir(os.path.join(output_path, lawyer))
+            case_folder = [folder for folder in case_list if contract_id in folder][0]
+            case_path = os.path.join(output_path, lawyer, case_folder)
 
-        if pz.split('-')[-1] not in os.listdir(os.path.join(case_path, '证据')):
-            shutil.copy(
-                os.path.join(input_path, '凭证', pz), 
-                os.path.join(case_path, '证据', pz.split('-')[-1])
-            )
-    
+            if pz.split('-')[-1] not in os.listdir(os.path.join(case_path, '证据')):
+                shutil.copy(
+                    os.path.join(input_path, '凭证', pz), 
+                    os.path.join(case_path, '证据', pz.split('-')[-1])
+                )
+        else:
+            print(f"凭证: {list_id} 不存在")
+            
     result += "\n\n凭证已分发"
+    
+    # 分发债转通知
+    zztz_list = os.listdir(os.path.join(input_path, '债转通知'))
+
+    for zztz in zztz_list:
+        list_id = int(zztz.split('_')[1].split('.')[0])
+        
+        if list_id in df['列表ID'].tolist():
+            contract_id = df[df['列表ID']==list_id]['合同号'].tolist()[0]
+        
+            lawyer = contract_to_lawyer[contract_id]
+            case_list = os.listdir(os.path.join(output_path, lawyer))
+            case_folder = [folder for folder in case_list if contract_id in folder][0]
+            case_path = os.path.join(output_path, lawyer, case_folder)
+
+            shutil.copy(
+                os.path.join(input_path, '债转通知', zztz), 
+                os.path.join(case_path, '债转通知', zztz)
+            )
+        else:
+            print(f"债转通知: {list_id} 不存在")
+    
+    result += "\n\n债转通知已分发"
 
     # 分发文档包到证据目录
     doc_pack_level_2 = os.listdir(os.path.join(input_path, '文档包'))[0]
@@ -105,7 +135,7 @@ def doc_packing(base_path, input_path, output_path):
     for doc_pack_folder in doc_pack_list:
         # 确定案件的输出目录路径 - 合同号 => 律师 => 案件输出路径
         contract_id = doc_pack_folder
-        lawyer = CONTRACT_TO_LAWYER[contract_id]
+        lawyer = contract_to_lawyer[contract_id]
         case_list = os.listdir(os.path.join(output_path, lawyer))
         case_folder = [folder for folder in case_list if contract_id in folder][0]
         case_path = os.path.join(output_path, lawyer, case_folder)
@@ -119,7 +149,7 @@ def doc_packing(base_path, input_path, output_path):
                             os.path.join(input_path, '文档包', doc_pack_level_2, doc_pack_folder, file),
                             os.path.join(case_path, '证据', evidence + '.pdf')
                         )
-                        print(os.path.join(case_path, '证据', evidence + '.pdf'))
+                        # print(os.path.join(case_path, '证据', evidence + '.pdf'))
                         
     result += "\n\n文档包已分发"
 
@@ -149,7 +179,9 @@ def doc_packing(base_path, input_path, output_path):
             wts_list = os.listdir(os.path.join(input_path, '委托书'))
 
             for wts in wts_list:
-                if contract_id in wts:
+                name_wts = wts.split('-')[0].split('委托书')[0]
+                number_wts = wts.split('-')[0].split('委托书')[1]
+                if name_wts in case_folder and number_wts in case_folder:
                     if '授权委托书.pdf' not in os.listdir(os.path.join(output_path, lawyer, case_folder, '委托材料')):
                         shutil.copy(
                             os.path.join(input_path, '委托书', wts),
@@ -173,7 +205,9 @@ def doc_packing(base_path, input_path, output_path):
             qsz_list = os.listdir(os.path.join(input_path, '起诉状'))
 
             for qsz in qsz_list:
-                if contract_id in qsz:
+                name_qsz = qsz.split('-')[0].split('起诉状')[0]
+                number_qsz = qsz.split('-')[0].split('起诉状')[1]
+                if name_qsz in case_folder and number_qsz in case_folder:
                     if '起诉状.pdf' not in os.listdir(os.path.join(output_path, lawyer, case_folder)):
                         shutil.copy(
                             os.path.join(input_path, '起诉状', qsz),
