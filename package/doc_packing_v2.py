@@ -7,13 +7,13 @@ INPUT_FOLDER = 'input'
 OUTPUT_FOLDER = 'output'
 
 # 设定BASE目录路径，输入目录路径，输出目录路径
-BASE_PATH = os.path.join(os.getcwd(), 'Documents', '2023', '10', '文档自动归类')
+BASE_PATH = os.path.join(os.getcwd(), 'Documents', '文档自动归类')
 INPUT_PATH = os.path.join(BASE_PATH, INPUT_FOLDER)
 OUTPUT_PATH = os.path.join(BASE_PATH, OUTPUT_FOLDER)
 
 # 设定表格文件名，律师人名
 EXCEL_FILE = 'info.xlsx'
-LAWYER_LIST = ['王磊', '张立人', '杨青']
+LAWYER_LIST = ['王磊', '张立人', '杨青', '梅世正']
 
 # 设定融担公司
 RONGDAN_LIST = [
@@ -106,27 +106,28 @@ def doc_packing(base_path, input_path, output_path):
     result += "\n\n凭证已分发"
     
     # 分发债转通知
-    zztz_list = os.listdir(os.path.join(input_path, '债转通知'))
+    if '债转通知' in os.listdir(input_path):
+        zztz_list = os.listdir(os.path.join(input_path, '债转通知'))
 
-    for zztz in zztz_list:
-        list_id = int(zztz.split('_')[1].split('.')[0])
-        
-        if list_id in df['列表ID'].tolist():
-            contract_id = df[df['列表ID']==list_id]['合同号'].tolist()[0]
-        
-            lawyer = contract_to_lawyer[contract_id]
-            case_list = os.listdir(os.path.join(output_path, lawyer))
-            case_folder = [folder for folder in case_list if contract_id in folder][0]
-            case_path = os.path.join(output_path, lawyer, case_folder)
+        for zztz in zztz_list:
+            list_id = int(zztz.split('_')[1].split('.')[0])
+            
+            if list_id in df['列表ID'].tolist():
+                contract_id = df[df['列表ID']==list_id]['合同号'].tolist()[0]
+            
+                lawyer = contract_to_lawyer[contract_id]
+                case_list = os.listdir(os.path.join(output_path, lawyer))
+                case_folder = [folder for folder in case_list if contract_id in folder][0]
+                case_path = os.path.join(output_path, lawyer, case_folder)
 
-            shutil.copy(
-                os.path.join(input_path, '债转通知', zztz), 
-                os.path.join(case_path, '债转通知', zztz)
-            )
-        else:
-            print(f"债转通知: {list_id} 不存在")
-    
-    result += "\n\n债转通知已分发"
+                shutil.copy(
+                    os.path.join(input_path, '债转通知', zztz), 
+                    os.path.join(case_path, '债转通知', zztz)
+                )
+            else:
+                print(f"债转通知: {list_id} 不存在")
+        
+        result += "\n\n债转通知已分发"
 
     # 分发文档包到证据目录
     doc_pack_level_2 = os.listdir(os.path.join(input_path, '文档包'))[0]
@@ -167,11 +168,11 @@ def doc_packing(base_path, input_path, output_path):
             contract_id = case_folder.split('-')[-1]
 
             # 复制标准文档到委托材料
-            standard_doc_list = os.listdir(os.path.join(R'Documents\标准文档', rongdan))
+            standard_doc_list = os.listdir(os.path.join(input_path, "标准文档", rongdan))
             for standard_doc in standard_doc_list:
                 if standard_doc not in os.listdir(os.path.join(output_path, lawyer, case_folder, '委托材料')):
                     shutil.copy(
-                        os.path.join(R'Documents\标准文档', rongdan, standard_doc),
+                        os.path.join(input_path, "标准文档", rongdan, standard_doc),
                         os.path.join(output_path, lawyer, case_folder, '委托材料')
                     )
 
@@ -179,8 +180,8 @@ def doc_packing(base_path, input_path, output_path):
             wts_list = os.listdir(os.path.join(input_path, '委托书'))
 
             for wts in wts_list:
-                name_wts = wts.split('-')[0].split('委托书')[0]
-                number_wts = wts.split('-')[0].split('委托书')[1]
+                name_wts = wts.split('_')[0]
+                number_wts = wts.split('_')[1]
                 if name_wts in case_folder and number_wts in case_folder:
                     if '授权委托书.pdf' not in os.listdir(os.path.join(output_path, lawyer, case_folder, '委托材料')):
                         shutil.copy(
@@ -205,8 +206,8 @@ def doc_packing(base_path, input_path, output_path):
             qsz_list = os.listdir(os.path.join(input_path, '起诉状'))
 
             for qsz in qsz_list:
-                name_qsz = qsz.split('-')[0].split('起诉状')[0]
-                number_qsz = qsz.split('-')[0].split('起诉状')[1]
+                name_qsz = qsz.split('_')[0]
+                number_qsz = qsz.split('_')[1]
                 if name_qsz in case_folder and number_qsz in case_folder:
                     if '起诉状.pdf' not in os.listdir(os.path.join(output_path, lawyer, case_folder)):
                         shutil.copy(

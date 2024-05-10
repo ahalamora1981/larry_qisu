@@ -14,21 +14,21 @@ with st.sidebar:
         '2. 文档自动归类'
     ))
 
-    if program == '1. 起诉状 & 委托书 - 自动编辑':
-        with open('resource/README_1.md', 'r') as f:
-            readme = f.read()
+    # if program == '1. 起诉状 & 委托书 - 自动编辑':
+    #     with open('resource/README_1.md', 'r') as f:
+    #         readme = f.read()
 
-        st.markdown(readme.split('[img]')[0])
-        st.image('resource/docs_format.jpg')
-        st.markdown(readme.split('[img]')[1])
+    #     st.markdown(readme.split('[img]')[0])
+    #     st.image('resource/docs_format.jpg')
+    #     st.markdown(readme.split('[img]')[1])
 
-    elif program == '2. 文档自动归类':
-        with open('resource/README_2.md', 'r') as f:
-            readme = f.read()
+    # elif program == '2. 文档自动归类':
+    #     with open('resource/README_2.md', 'r') as f:
+    #         readme = f.read()
 
-        st.markdown(readme.split('[img]')[0])
-        st.image('resource/docs_format_2.jpg')
-        st.markdown(readme.split('[img]')[1])
+    #     st.markdown(readme.split('[img]')[0])
+    #     st.image('resource/docs_format_2.jpg')
+    #     st.markdown(readme.split('[img]')[1])
 
 if program == '1. 起诉状 & 委托书 - 自动编辑':
 

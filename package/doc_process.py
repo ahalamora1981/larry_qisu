@@ -25,9 +25,12 @@ def doc_process(input_path, output_path):
     # phone_zhangliren = phone
     # phone_yangqing = phone
 
-    phone_wanglei = '18916935832'
-    phone_zhangliren = '13817213203'
-    phone_yangqing = '15221111951'
+    phones = [
+        '18916935832', # 王磊
+        '13817213203', # 张立人
+        '15221111951', # 杨青
+        '15900621166' # 梅世正
+    ]
 
     qsz_file_list = os.listdir(qsz_folder)
     wts_file_list = os.listdir(wts_folder)
@@ -126,40 +129,33 @@ def doc_process(input_path, output_path):
         
         # 从文件名获取合同号
         contract_id = wts_file.split('_')[1]
+        lawyer = df[df['合同号']==contract_id]['承办律师'].tolist()[0]
         
         for p in doc.paragraphs:
-            if phone_wanglei in p.text:
-                text_new_phone = p.text.replace(phone_wanglei, phone_number)
+            if '王磊' in p.text:
+                text_new_name = p.text.replace('王磊', lawyer)
                 p.text = ''
                 # 加run用于修改字体
-                run = p.add_run(text_new_phone)
+                run = p.add_run(text_new_name)
                 run.font.name = "Arial"
                 run._element.rPr.rFonts.set(qn('w:eastAsia'),'宋体')
                 # 调整字体
                 font = p.style.font
                 font.size = Pt(14)
-            elif phone_zhangliren in p.text:
-                text_new_phone = p.text.replace(phone_zhangliren, phone_number)
-                p.text = ''
-                # 加run用于修改字体
-                run = p.add_run(text_new_phone)
-                run.font.name = "Arial"
-                run._element.rPr.rFonts.set(qn('w:eastAsia'),'宋体')
-                # 调整字体
-                font = p.style.font
-                font.size = Pt(14)
-            elif phone_yangqing in p.text:
-                text_new_phone = p.text.replace(phone_yangqing, phone_number)
-                p.text = ''
-                # 加run用于修改字体
-                run = p.add_run(text_new_phone)
-                run.font.name = "Arial"
-                run._element.rPr.rFonts.set(qn('w:eastAsia'),'宋体')
-                # 调整字体
-                font = p.style.font
-                font.size = Pt(14)
-            else:
-                pass
+            
+            for phone in phones:
+                if phone in p.text:
+                    text_new_phone = p.text.replace(phone, phone_number)
+                    p.text = ''
+                    # 加run用于修改字体
+                    run = p.add_run(text_new_phone)
+                    run.font.name = "Arial"
+                    run._element.rPr.rFonts.set(qn('w:eastAsia'),'宋体')
+                    # 调整字体
+                    font = p.style.font
+                    font.size = Pt(14)
+                    
+                    break
         
         # 从表格中找到对应合同号的管辖法院
         # lawyer = df[df['合同号']==contract_id]['承办律师'].tolist()[0]
