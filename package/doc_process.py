@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+from tqdm import tqdm
 from docx import Document
 from docx.shared import Pt
 from docx.oxml.ns import qn
@@ -244,5 +245,77 @@ def doc_process(input_path, output_path):
     
     return result
 
+def mail_generate(input_path: os.PathLike, output_path: os.PathLike) -> None:
+    info_path = os.path.join(input_path, 'info.xlsx')
+    
+    if not os.path.exists(output_path):
+        os.mkdir(output_path)
+    
+    df = pd.read_excel(info_path)
+    if set(df['是否可诉'].unique()) == {'诉讼', '否'}:
+        print('OK')
+    
+    df = df[df['是否可诉']=='诉讼']
+    
+    for _, row in df.iterrows():
+        row = row.astype('str')
+        company_fullname = row['融担公司']
+        
+        if '福建智云' in company_fullname:
+            company = '福建智云融资担保有限责任公司'
+        elif '海南申信' in company_fullname:
+            company = '海南申信融资担保有限公司'
+        else:
+            company = '上海耳序信息技术有限公司'
+
+        user = row['用户姓名']
+        court = row['管辖法院']
+        lawyer = row['承办律师']
+        
+        break
+        
+        # doc = Document(os.path.join(input_path, '安徽苏滁律师事务所函.docx'))
+        
+        # for p in doc.paragraphs:
+        #     for r in p.runs:
+        #         r.text = r.text.replace('【用户姓名】', user)
+        #         r.text = r.text.replace('【融担公司】', company)
+        #         r.text = r.text.replace('【管辖法院】', court)
+        #         r.text = r.text.replace('【承办律师】', lawyer)
+
+        # doc_output_path = os.path.join(output_path, f"{user}--{company}--{court}--{lawyer}.docx")
+        # doc.save(doc_output_path)
+        
+        # if lawyer == 'nan':
+        #     print(f"Error: No Lawyer ({user}--{company}--{court}--{lawyer})")
+
+def check_info(input_path: os.PathLike) -> None:
+    cols = ['公司名称', '手别', '案件id', '用户ID', '用户名', '用户姓名', '身份证号码', '性别', '民族', '身份证地址', '注册手机号', '列表ID', '合同号', '资方机构', '融担公司', '合同金额', '放款日期', '最后一期应还款日', '借款期数', '利率', '逾期开始日期', '上一个还款日期', '列表逾期天数', '待还金额', '待还本金', '待还费用', '数据提取日', '合并 代偿回购总额', '合并 代偿回购本金', '合并 代偿回购利息', '合并 代偿回购罚息', '是否可诉', '最晚代偿回购时间', '管辖法院', '承办律师']
+    
+    info_path = os.path.join(input_path, 'info.xlsx')
+    df = pd.read_excel(info_path)
+    
+    for col in cols:
+        if col not in df.columns:
+            print(f"Column “{col}” is missing!")
+            break
+    else:
+        print("Columns are OK!")
+    
+    if set(df['是否可诉'].unique()) == {'诉讼', '否'}:
+        print('“是否可诉” is OK!')
+        
+        
 if __name__ == '__main__':
-    doc_process()
+    CWD = os.getcwd()
+    
+    # doc_process()
+    
+    # mail_generate(
+    #     os.path.join(CWD, "Documents", "律所函"), 
+    #     os.path.join(CWD, "Documents","律所函", "output")
+    # )
+    
+    check_info(os.path.join(CWD, "Documents", "律所函"))
+    
+    
